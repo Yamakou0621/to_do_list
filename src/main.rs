@@ -1,5 +1,5 @@
 use std::io;
-
+#[derive(Debug)]
 struct Task {
     description: String,
     completed: bool,
@@ -34,11 +34,28 @@ fn handle_command(input: &str, tasks: &mut Vec<Task>) {
             description: desc,
             completed: false,
         });
-        println!("タスクを追加しました");
+        println!("タスクを追加しました。");
     } else if input == "list" {
-        for (i, task) in tasks.iter().enumerate() {
-            let status = if task.completed { "[x]" } else { "[ ]" };
-            println!("{} {} {}", i + 1, status, task.description);
+        if tasks.is_empty() {
+            println!("タスクが存在しません。");
+        } else {
+            for (i, task) in tasks.iter().enumerate() {
+                let status = if task.completed { "[x]" } else { "[ ]" };
+                println!("{} {} {}", i + 1, status, task.description);
+            }
+        }
+    } else if input.starts_with("done ") {
+        let index_str = input.trim_start_matches("done ").trim();
+        if let Ok(index) = index_str.parse::<usize>() {
+            let i = index - 1;
+            if let Some(task) = tasks.get_mut(i) {
+                task.completed = true;
+                println!("タスク{} を完了にしました。", index);
+            } else {
+                println!("その番号のタスクは存在しません。");
+            }
+        } else {
+            println!("番号を正しく入力してください。例: done 1");
         }
     } else {
         println!("不明なコマンドです");
